@@ -1,0 +1,1 @@
+# simfin-excel-plugin
