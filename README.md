@@ -1,5 +1,6 @@
 # simfin-excel-plugin
 
+## Setup Windows
 * Open Developer Tab in Excel.
 * click on Excel Add ins.
 * Browse and select Book3.xlam
