@@ -51,7 +51,7 @@ Function SimFin(Ticker As String, Year As String, Period As String, Columname As
     
     
     Set objRequest = CreateObject("MSXML2.XMLHTTP")
-    strUrl = "http://192.168.2.115:8081/api/v3/companies/statements/excel-plugin?ticker=" + URLEncode(Ticker) + "&period=" + Period + "&fyear=" + Year + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported + "&ttm=" + Ttm
+    strUrl = "https://backend.simfin.com/api/v3/companies/statements/excel-plugin?ticker=" + URLEncode(Ticker) + "&period=" + Period + "&fyear=" + Year + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported + "&ttm=" + Ttm
     blnAsync = True
 
     With objRequest
