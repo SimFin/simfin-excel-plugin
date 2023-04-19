@@ -26,6 +26,4 @@ So for example:
 or if you want to retrieve TTM values for Q1 2020:
 ```=SimFin("AAPL"; 2020; "Q1"; "Revenue"; "YOUR-API-KEY"; "true")```
 
-Your API-key can be found at https://app.simfin.com/developers
-
-To see all the available line item names, visit https://app.simfin.com/developers/columns
+Your API-key and more info (for example all available lien item names) can be found at https://app.simfin.com/excel
