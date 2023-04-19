@@ -1,6 +1,6 @@
 # SimFin Excel Plugin
 
-Follow the instructions below to install the Excel Plugin or check out the Example.xlsx file. Currently you have to import the function manually, we are working on a better installation method.
+Follow the instructions below to install the Excel Plugin. Check out the Example.xlsx file for a detailed usage example.
 
 ## Installation for Excel under Windows
 
