@@ -14,15 +14,17 @@ Follow the instructions below to install the Excel Plugin. Check out the Example
 
 The formula is:
 
+```
 =SimFin(Company Ticker As String, Year As Integer, Period As String, Columname As String, API-key As String, [optional] ttm as String = "false", [optional] asReported as String = "false")
+```
 
 To see the inputs in the formula, type "=simfin(" and then press Ctrl + Shift + a
 
 So for example:
-=SimFin("AAPL", 2020, "FY", "Revenue", "YOUR-API-KEY")
+```=SimFin("AAPL", 2020, "FY", "Revenue", "YOUR-API-KEY")```
 
 or if you want to retrieve TTM values for Q1 2020:
-=SimFin("AAPL", 2020, "Q1", "Revenue", "YOUR-API-KEY", "true")
+```=SimFin("AAPL", 2020, "Q1", "Revenue", "YOUR-API-KEY", "true")```
 
 Your API-key can be found at https://app.simfin.com/developers
 
