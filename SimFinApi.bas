@@ -1,3 +1,4 @@
+Attribute VB_Name = "SimFinApi"
 
 Public Function URLEncode( _
    StringVal As String, _
