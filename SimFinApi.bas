@@ -1,4 +1,3 @@
-Attribute VB_Name = "SimFinApi"
 
 Public Function URLEncode( _
    StringVal As String, _
@@ -34,22 +33,22 @@ End Function
 
 
 Function SimFin(Ticker As String, Year As String, Period As String, Columname As String, Token As String, Optional Ttm As String, Optional AsReported As String) As Variant
-    
+
     Dim JsonObject As Object
     Dim objRequest As Object
     Dim strUrl As String
     Dim blnAsync As Boolean
     Dim strResponse As String
     Dim output As Variant
-    
+
     If IsMissing(AsReported) Then
         AsReported = "false"
     End If
     If IsMissing(Ttm) Then
         Ttm = "false"
     End If
-    
-    
+
+
     Set objRequest = CreateObject("MSXML2.XMLHTTP")
     strUrl = "https://backend.simfin.com/api/v3/excel-plugin/statements?ticker=" + URLEncode(Ticker) + "&period=" + Period + "&fyear=" + Year + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported + "&ttm=" + Ttm
     blnAsync = True
@@ -73,23 +72,29 @@ Function SimFin(Ticker As String, Year As String, Period As String, Columname As
     SimFin = output
 End Function
 
-Function SimFinPrices(Ticker As String, Start As String, Columname As String, Token As String, Optional AsReported As String) As Variant
-    
+Function SimFinPrices(Ticker As String, DateString As String, Columname As String, Token As String, Optional AsReported As String) As Variant
+
+    Application.ThousandsSeparator = ","
+    Application.DecimalSeparator = "."
+    Application.UseSystemSeparators = False
+
     Dim JsonObject As Object
     Dim objRequest As Object
     Dim strUrl As String
     Dim blnAsync As Boolean
     Dim strResponse As String
     Dim output As Variant
-    
+
     If IsMissing(AsReported) Then
         AsReported = "false"
     End If
-    
+
+    DateString = Format(CDate(DateString), "yyyy-mm-dd")
+
     Set objRequest = CreateObject("MSXML2.XMLHTTP")
-    strUrl = "https://backend.simfin.com/api/v3/excel-plugin/prices?ticker=" + URLEncode(Ticker) + "&start=" + Start + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported
+    strUrl = "https://backend.simfin.com/api/v3/excel-plugin/prices?ticker=" + URLEncode(Ticker) + "&start=" + DateString + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported
     blnAsync = True
-    
+
     With objRequest
         .Open "GET", strUrl, blnAsync
         .setRequestHeader "Content-Type", "application/json"
@@ -102,7 +107,15 @@ Function SimFinPrices(Ticker As String, Start As String, Columname As String, To
         strResponse = .responseText
     End With
     If IsNumeric(Trim(strResponse)) Then
-        output = Trim(strResponse) * 1
+        var1 = CDbl(Trim(strResponse))
+        var2 = CDbl(Trim(Replace(strResponse, ".", ",")))
+        t1 = Abs(var1)
+        t2 = Abs(var2)
+        If t2 < t1 Then
+            output = t2
+        Else
+            output = t1
+        End If
     Else
         output = strResponse
     End If
