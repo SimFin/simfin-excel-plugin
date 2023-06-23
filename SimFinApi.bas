@@ -1,3 +1,4 @@
+Attribute VB_Name = "SimFinApi"
 
 Public Function URLEncode( _
    StringVal As String, _
@@ -73,10 +74,6 @@ Function SimFin(Ticker As String, Year As String, Period As String, Columname As
 End Function
 
 Function SimFinPrices(Ticker As String, DateString As String, Columname As String, Token As String, Optional AsReported As String) As Variant
-
-    Application.ThousandsSeparator = ","
-    Application.DecimalSeparator = "."
-    Application.UseSystemSeparators = False
 
     Dim JsonObject As Object
     Dim objRequest As Object
