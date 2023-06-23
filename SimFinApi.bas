@@ -73,6 +73,41 @@ Function SimFin(Ticker As String, Year As String, Period As String, Columname As
     SimFin = output
 End Function
 
-
-
+Function SimFinPrices(Ticker As String, Start As String, Columname As String, Token As String, Optional AsReported As String) As Variant
+    
+    Dim JsonObject As Object
+    Dim objRequest As Object
+    Dim strUrl As String
+    Dim blnAsync As Boolean
+    Dim strResponse As String
+    Dim output As Variant
+    
+    If IsMissing(AsReported) Then
+        AsReported = "false"
+    End If
+    
+    Set objRequest = CreateObject("MSXML2.XMLHTTP")
+    strUrl = "https://backend.simfin.com/api/v3/excel-plugin/prices?ticker=" + URLEncode(Ticker) + "&start=" + Start + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported
+    blnAsync = True
+    
+    With objRequest
+        .Open "GET", strUrl, blnAsync
+        .setRequestHeader "Content-Type", "application/json"
+        .setRequestHeader "Authorization", "api-key " + Token
+        .Send
+        'spin wheels whilst waiting for response
+        While objRequest.readyState <> 4
+            DoEvents
+        Wend
+        strResponse = .responseText
+    End With
+    If IsNumeric(Trim(strResponse)) Then
+        output = Trim(strResponse) * 1
+    Else
+        output = strResponse
+    End If
+    SimFinPrices = output
+    
+    
+End Function
 
