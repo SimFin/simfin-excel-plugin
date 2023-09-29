@@ -1,5 +1,13 @@
 Attribute VB_Name = "SimFinApi"
 
+Option Explicit
+
+
+Private Declare PtrSafe Function popen Lib "libc.dylib" (ByVal command As String, ByVal mode As String) As LongPtr
+Private Declare PtrSafe Function pclose Lib "libc.dylib" (ByVal file As LongPtr) As Long
+Private Declare PtrSafe Function fread Lib "libc.dylib" (ByVal outStr As String, ByVal size As LongPtr, ByVal items As LongPtr, ByVal stream As LongPtr) As Long
+Private Declare PtrSafe Function feof Lib "libc.dylib" (ByVal file As LongPtr) As LongPtr
+
 Public Function URLEncode( _
    StringVal As String, _
    Optional SpaceAsPlus As Boolean = False _
@@ -32,46 +40,95 @@ Public Function URLEncode( _
   End If
 End Function
 
+Function GetOperatingSystem() As String
+    Dim os As String
+    os = Application.OperatingSystem
+    
+    If InStr(1, os, "Windows") > 0 Then
+        GetOperatingSystem = "Windows"
+    ElseIf InStr(1, os, "Macintosh") > 0 Then
+        GetOperatingSystem = "Mac"
+    Else
+        GetOperatingSystem = "Unknown"
+    End If
+End Function
 
-Function SimFin(Ticker As String, Year As String, Period As String, Columname As String, Token As String, Optional Ttm As String, Optional AsReported As String) As Variant
+
+
+Function execShell(command As String, Optional ByRef exitCode As Long) As String
+    Dim file As LongPtr
+    file = popen(command, "r")
+
+    If file = 0 Then
+        Exit Function
+    End If
+
+    While feof(file) = 0
+        Dim chunk As String
+        Dim read As Long
+        chunk = Space(50)
+        read = fread(chunk, 1, Len(chunk) - 1, file)
+        If read > 0 Then
+            chunk = Left$(chunk, read)
+            execShell = execShell & chunk
+        End If
+    Wend
+
+    exitCode = pclose(file)
+End Function
+
+
+Function SimFin(Ticker As String, Year As String, Period As String, Columname As String, Token As String, Optional Ttm As String = "false", Optional AsReported As String = "false") As Variant
 
     Dim JsonObject As Object
     Dim objRequest As Object
     Dim strUrl As String
     Dim blnAsync As Boolean
     Dim strResponse As String
+    Dim os As String
     Dim output As Variant
 
+    
+    
     If IsMissing(AsReported) Then
         AsReported = "false"
     End If
     If IsMissing(Ttm) Then
         Ttm = "false"
     End If
-
-
-    Set objRequest = CreateObject("MSXML2.XMLHTTP")
+    os = GetOperatingSystem()
     strUrl = "https://backend.simfin.com/api/v3/excel-plugin/statements?ticker=" + URLEncode(Ticker) + "&period=" + Period + "&fyear=" + Year + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported + "&ttm=" + Ttm
-    blnAsync = True
-
-    With objRequest
-        .Open "GET", strUrl, blnAsync
-        .setRequestHeader "Content-Type", "application/json"
-        .setRequestHeader "Authorization", "api-key " + Token
-        .Send
-        'spin wheels whilst waiting for response
-        While objRequest.readyState <> 4
-            DoEvents
-        Wend
-        strResponse = .responseText
-    End With
-    If IsNumeric(Trim(strResponse)) Then
-        output = Trim(strResponse) * 1
+    If os = "Windows" Then
+        Set objRequest = CreateObject("MSXML2.ServerXMLHTTP")
+        blnAsync = True
+    
+        With objRequest
+            .Open "GET", strUrl, blnAsync
+            .setRequestHeader "Content-Type", "application/json"
+            .setRequestHeader "Authorization", "api-key " + Token
+            .Send
+            'spin wheels whilst waiting for response
+            While objRequest.readyState <> 4
+                DoEvents
+            Wend
+            strResponse = .responseText
+        End With
+       
     Else
-        output = strResponse
+        Dim curlCommand As String
+        curlCommand = "curl -s -H 'Content-Type: application/json' -H 'Authorization: api-key " & Token & "' -o - """ & strUrl & """"
+        strResponse = execShell(curlCommand)
+       
     End If
-    SimFin = output
+     If IsNumeric(Trim(strResponse)) Then
+            output = Trim(strResponse) * 1
+        Else
+            output = strResponse
+        End If
+        SimFin = output
+        
 End Function
+
 
 Function SimFinPrices(Ticker As String, DateString As String, Columname As String, Token As String, Optional AsReported As String) As Variant
 
@@ -81,28 +138,39 @@ Function SimFinPrices(Ticker As String, DateString As String, Columname As Strin
     Dim blnAsync As Boolean
     Dim strResponse As String
     Dim output As Variant
+    Dim os As String
+    Dim var1 As Variant
+    Dim var2 As Variant
+    Dim t1 As Variant
+    Dim t2 As Variant
 
     If IsMissing(AsReported) Then
         AsReported = "false"
     End If
 
     DateString = Format(CDate(DateString), "yyyy-mm-dd")
-
-    Set objRequest = CreateObject("MSXML2.XMLHTTP")
+    os = GetOperatingSystem()
     strUrl = "https://backend.simfin.com/api/v3/excel-plugin/prices?ticker=" + URLEncode(Ticker) + "&start=" + DateString + "&columnName=" + URLEncode(Columname) + "&asreported=" + AsReported
-    blnAsync = True
-
-    With objRequest
-        .Open "GET", strUrl, blnAsync
-        .setRequestHeader "Content-Type", "application/json"
-        .setRequestHeader "Authorization", "api-key " + Token
-        .Send
-        'spin wheels whilst waiting for response
-        While objRequest.readyState <> 4
-            DoEvents
-        Wend
-        strResponse = .responseText
-    End With
+    If os = "Windows" Then
+        Set objRequest = CreateObject("MSXML2.XMLHTTP")
+        blnAsync = True
+    
+        With objRequest
+            .Open "GET", strUrl, blnAsync
+            .setRequestHeader "Content-Type", "application/json"
+            .setRequestHeader "Authorization", "api-key " + Token
+            .Send
+            'spin wheels whilst waiting for response
+            While objRequest.readyState <> 4
+                DoEvents
+            Wend
+            strResponse = .responseText
+        End With
+    Else
+        Dim curlCommand As String
+        curlCommand = "curl -s -H 'Content-Type: application/json' -H 'Authorization: api-key " & Token & "' -o - """ & strUrl & """"
+        strResponse = execShell(curlCommand)
+    End If
     If IsNumeric(Trim(strResponse)) Then
         var1 = CDbl(Trim(strResponse))
         var2 = CDbl(Trim(Replace(strResponse, ".", ",")))
@@ -120,4 +188,3 @@ Function SimFinPrices(Ticker As String, DateString As String, Columname As Strin
     
     
 End Function
-
