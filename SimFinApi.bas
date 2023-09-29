@@ -1,3 +1,4 @@
+Attribute VB_Name = "SimFinApi"
 Option Explicit
 
 Private Declare PtrSafe Function popen Lib "libc.dylib" (ByVal command As String, ByVal mode As String) As LongPtr
