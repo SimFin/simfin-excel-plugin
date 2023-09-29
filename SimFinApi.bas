@@ -2,8 +2,7 @@ Attribute VB_Name = "SimFinApi"
 
 Option Explicit
 
-' execShell() function courtesy of Robert Knight via StackOverflow
-' http://stackoverflow.com/questions/6136798/vba-shell-function-in-office-2011-for-mac
+
 Private Declare PtrSafe Function popen Lib "libc.dylib" (ByVal command As String, ByVal mode As String) As LongPtr
 Private Declare PtrSafe Function pclose Lib "libc.dylib" (ByVal file As LongPtr) As Long
 Private Declare PtrSafe Function fread Lib "libc.dylib" (ByVal outStr As String, ByVal size As LongPtr, ByVal items As LongPtr, ByVal stream As LongPtr) As Long
