@@ -88,6 +88,7 @@ Function SimFin(Ticker As String, Year As String, Period As String, Columname As
     Dim strResponse As String
     Dim os As String
     Dim output As Variant
+
     
     
     If IsMissing(AsReported) Then
@@ -114,11 +115,9 @@ Function SimFin(Ticker As String, Year As String, Period As String, Columname As
             strResponse = .responseText
         End With
        
-    ElseIf os = "Mac" Then
-        
+    Else
         Dim curlCommand As String
         curlCommand = "curl -s -H 'Content-Type: application/json' -H 'Authorization: api-key " & Token & "' -o - """ & strUrl & """"
-        
         strResponse = execShell(curlCommand)
        
     End If
@@ -140,6 +139,11 @@ Function SimFinPrices(Ticker As String, DateString As String, Columname As Strin
     Dim blnAsync As Boolean
     Dim strResponse As String
     Dim output As Variant
+    Dim os As String
+    Dim var1 As Variant
+    Dim var2 As Variant
+    Dim t1 As Variant
+    Dim t2 As Variant
 
     If IsMissing(AsReported) Then
         AsReported = "false"
@@ -163,7 +167,7 @@ Function SimFinPrices(Ticker As String, DateString As String, Columname As Strin
             Wend
             strResponse = .responseText
         End With
-    ElseIf os = "Mac" Then
+    Else
         Dim curlCommand As String
         curlCommand = "curl -s -H 'Content-Type: application/json' -H 'Authorization: api-key " & Token & "' -o - """ & strUrl & """"
         strResponse = execShell(curlCommand)
